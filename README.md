@@ -285,3 +285,7 @@ Möglichkeiten:
 
 *Satoshi — Bitcoin Verstehen | Open Source seit März 2026*
 *Built with ❤️ and ₿ by BIT Solutions*
+
+---
+
+*Einordnung in die BITS-Landschaft (Abhängigkeiten, Standard, Register): siehe [CLAUDE.md](CLAUDE.md) und `c:\DEV\BITS-SP-BITSOLUTIONSGMBH\docs\90-projektregister.md` — Stand 28.09.2026.*
