@@ -1,5 +1,13 @@
 # BTC-Klar – Verbesserungs-TODO
 
+## Update 12.10.2026 · Version 3.6.0 (deployt)
+
+- [x] Neue Startseite, Themenkarten, Navigation und Rabbit-Hole-Kapitelübersicht.
+- [x] Persönlicher Lernstart und Wallet-Führerschein mit lokalem Speicher und Backup-Integration.
+- [x] Build, Regressionstests und Deployment-Smoke-Tests.
+- [ ] Visuelle Kontrolle des neuen Designs auf Desktop und Mobilgeräten.
+- Enthält auch die zuvor lokalen Änderungen der Versionen 3.4.0 und 3.5.0.
+
 ## Update 07.10.2026 · Version 3.5.0 (lokal, noch nicht deployt)
 
 - [x] Einstieg bzw. Weiterlernen direkt unter dem Titel; Marktdaten und Spielstatistik unter der Modulübersicht.

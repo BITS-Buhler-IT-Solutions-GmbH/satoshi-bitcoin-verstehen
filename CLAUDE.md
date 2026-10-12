@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | **Was** | «Satoshi — Bitcoin verstehen»: interaktive Bildungs-PWA, 44 Module, live auf btc-klar.ch. |
-| **Kategorie** | Eigenprodukt (ruht) |
-| **Status** | live, Entwicklung ruht seit 28.04.2026 |
+| **Kategorie** | Eigenprodukt |
+| **Status** | live, Version 3.6.0 deployt am 12.10.2026 |
 | **Läuft auf** | Hostpoint (Apache/.htaccess) |
 | **Steckbrief** | `c:\DEV\BITS-SP-BITSOLUTIONSGMBH\docs\90-projektregister.md Abschnitt C` · Register `docs\90-projektregister.md` |
 | **Hängt ab von** | — — Identitäten in `docs\20-schnittstellen.md` |

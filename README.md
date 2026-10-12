@@ -7,6 +7,8 @@ Kostenlos, werbefrei, Open Source.
 
 > **Live:** [btc-klar.ch](https://btc-klar.ch)
 
+> **Deployment:** Version 3.6.0 · 12.10.2026 — neue Gestaltung, persönlicher Lernstart und Wallet-Führerschein.
+
 ---
 
 ## Was ist Satoshi?

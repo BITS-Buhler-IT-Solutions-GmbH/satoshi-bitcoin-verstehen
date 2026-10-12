@@ -2,8 +2,8 @@
  *  Cache-first for app shell, network-first for API data
  */
 
-const SHELL_CACHE  = 'satoshi-v46';
-// shell-hash: 641ca8e55fdf  (gesetzt von scripts/sw-stamp.js — nicht von Hand ändern)
+const SHELL_CACHE  = 'satoshi-v47';
+// shell-hash: 0cd0c333f008  (gesetzt von scripts/sw-stamp.js — nicht von Hand ändern)
 const API_CACHE    = 'satoshi-api-v2';
 const API_TTL      = 5 * 60 * 1000;       // 5 minutes — serve cache without refresh
 const API_STALE    = 24 * 60 * 60 * 1000; // 24h hard limit for offline fallback
