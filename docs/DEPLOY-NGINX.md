@@ -127,7 +127,7 @@ Die wichtigsten Header für die App:
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
 Referrer-Policy: strict-origin-when-cross-origin
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://platform.twitter.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://api.blockchain.info https://blockchain.info https://api.coingecko.com https://mempool.space https://api.alternative.me https://api.codetabs.com https://api.allorigins.win; frame-src https://platform.twitter.com https://www.youtube.com; manifest-src 'self';
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://api.blockchain.info https://blockchain.info https://api.coingecko.com https://mempool.space https://api.alternative.me https://cloud.umami.is https://gateway.umami.is; frame-src https://www.youtube.com; manifest-src 'self';
 ```
 
 > **Tipp:** Bei Standard-Webhosting den Hostpoint-Support kontaktieren, um Custom-Header setzen zu lassen. Oder per Meta-Tags im HTML als Fallback (bereits in `index.html` vorhanden für CSP).

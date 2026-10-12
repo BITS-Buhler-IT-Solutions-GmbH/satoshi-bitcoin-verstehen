@@ -7,8 +7,8 @@
 #  — wir wechseln automatisch.
 #
 #  Workflow:
-#    1) check.js              — Konsistenz-Validation
-#    2) compress.js           — Brotli + Gzip Pre-Compression
+#    1) compress.js           — Brotli + Gzip Pre-Compression
+#    2) check.js              — Konsistenz-Validation (inkl. SW-Stamp)
 #    3) tar | ssh -> entpack  — atomarer Upload via SSH-Pipe
 #                               (oder rsync, wenn vorhanden)
 #    4) Smoke-Test            — Brotli-Antwort verifiziert
@@ -29,12 +29,14 @@ LOCAL_PUBLIC="public"
 
 cd "$(dirname "$0")/.."
 
-echo "→ 1/4 Build-Validation"
-node scripts/check.js
+echo "→ 1/4 Build (src/ → public/) + SW-Stamp + Pre-Compression"
+node scripts/build.js
+node scripts/sw-stamp.js
+node scripts/compress.js
 
 echo
-echo "→ 2/4 Pre-Compression (Brotli + Gzip)"
-node scripts/compress.js
+echo "→ 2/4 Build-Validation (prüft auch SW-Stamp und Kompressions-Stand)"
+node scripts/check.js
 
 echo
 echo "→ 3/4 Upload nach $SSH_HOST:$HOSTPOINT_DOCROOT"
@@ -63,7 +65,7 @@ else
   # Variante A: Komplett-Tausch via Staging-Verzeichnis
   STAMP="$(date +%Y%m%d-%H%M%S)"
   STAGING="$HOSTPOINT_DOCROOT.staging-$STAMP"
-  PREVIOUS="$HOSTPOINT_DOCROOT.previous"
+  PREVIOUS="$HOSTPOINT_DOCROOT.previous-$STAMP"
 
   echo "  rsync nicht gefunden — nutze tar | ssh (atomarer Tausch)"
   echo "  Staging: $STAGING"
@@ -75,11 +77,11 @@ else
   # Atomarer Tausch:
   #   docroot      → previous
   #   staging      → docroot
-  #   altes previous löschen
+  #   vorhandene Backups behalten; kein bisheriger Stand wird gelöscht
   ssh "$SSH_HOST" "
     set -e
+    test ! -e '$PREVIOUS'
     if [ -d '$HOSTPOINT_DOCROOT' ]; then
-      rm -rf '$PREVIOUS' || true
       mv '$HOSTPOINT_DOCROOT' '$PREVIOUS'
     fi
     mv '$STAGING' '$HOSTPOINT_DOCROOT'
@@ -97,6 +99,14 @@ if [ "$HTTP_STATUS" != "200" ]; then
   exit 1
 fi
 echo "  ✓ HTTP 200"
+
+echo "  GET /api/feed.php?id=blocktrainer (News-Proxy) ..."
+FEED_BODY="$(curl -s --max-time 20 'https://btc-klar.ch/api/feed.php?id=blocktrainer' | head -c 2000 || true)"
+if printf '%s' "$FEED_BODY" | grep -q '<rss\|<feed\|<channel'; then
+  echo "  ✓ News-Proxy liefert RSS"
+else
+  echo "  ⚠ News-Proxy liefert kein RSS (PHP aktiv? cURL/allow_url_fopen?) — News-Modul bleibt leer"
+fi
 
 echo "  Encoding-Decode-Test (mit Chrome-Headern) ..."
 # tmp-File im Repo-Root, weil Node unter Windows /tmp nicht mit POSIX-Path

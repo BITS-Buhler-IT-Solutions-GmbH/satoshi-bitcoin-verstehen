@@ -22,6 +22,7 @@ Satoshi ist eine umfassende Bitcoin-Bildungs-App, die als Single-Page PWA komple
 ### Bildung
 - **44 interaktive Module** — Geld, Inflation, Blockchain, Mining, Lightning, Wallets, Kryptographie, On-Chain, Privacy, CBDCs, u.v.m.
 - **Schwierigkeitsgrade** — Einsteiger → Fortgeschritten → Experte
+- **Bewusste Modulabschlüsse** — angesehen, abgeschlossen und bestandene Modul-Quizfragen werden getrennt angezeigt; Lernpfade zählen bestätigte Abschlüsse.
 - **Bitcoin-Lexikon** — 65+ Fachbegriffe mit Live-Suche
 - **Literatur & Medien** — Bücher, Podcasts, Videos, Kanäle
 
@@ -77,6 +78,7 @@ Alternativ via npm-Skripten:
 ```bash
 npm run dev      # Dev-Server
 npm run check    # Build-Check
+npm test         # Regressionen für Speicher, Fortschrittsimport und Initialisierung
 ```
 
 > **Hinweis:** HTTPS ist erforderlich für PWA-Funktionalität (Service Worker, Installation). Lokal funktioniert `localhost` auch ohne HTTPS.

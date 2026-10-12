@@ -1,5 +1,14 @@
 # BTC-Klar – Verbesserungs-TODO
 
+## Update 07.10.2026 · Version 3.5.0 (lokal, noch nicht deployt)
+
+- [x] Einstieg bzw. Weiterlernen direkt unter dem Titel; Marktdaten und Spielstatistik unter der Modulübersicht.
+- [x] Besuche von bewussten Modulabschlüssen trennen; Modul-Quiz separat anzeigen; Lernpfade zählen Abschlüsse.
+- [x] Gespeicherte Fortschrittsdaten fehlertolerant laden und vor dem Import vollständig prüfen.
+- [x] Import-Rollback bei Schreibfehlern und korrekte Speicherung des aktiven Lernpfades.
+- [x] Idle-Initialisierung bei Timeout und ohne Idle-API korrigieren.
+- [x] Regressionstests sowie Desktop- und Mobil-Browserprüfung.
+
 > **Stand: 2026-04-25 · App-Version 3.3.0**
 > Erledigte Items sind mit `[x]` markiert. Details zu jedem Release siehe
 > Modul «Changelog» in der App oder den `CHANGELOG`-Block in `index.html`.

@@ -55,11 +55,11 @@ BITS-SATOSHI-APP/
 ## Deploy-Workflow (Cheatsheet)
 
 ```bash
-# 1) Validation
-node scripts/check.js
-
-# 2) Pre-Compression (Brotli + Gzip — spart ~80% HTML)
-node scripts/compress.js
+# 1) SW-Cache stempeln + Validation + Pre-Compression in einem Schritt
+npm run build
+#    = node scripts/sw-stamp.js   (erhöht SHELL_CACHE, wenn sich die Shell geändert hat)
+#    + node scripts/compress.js   (Brotli + Gzip — spart ~80% HTML)
+#    + node scripts/check.js      (Konsistenz, JS-Syntax, ß, Icons, Kaninchen, SW-Stamp, Kompressions-Stand …)
 
 # 3) rsync nach Production
 rsync -avz --delete public/ user@server:/var/www/btc-klar.ch/
@@ -70,7 +70,9 @@ curl -I -H "Accept-Encoding: br" https://btc-klar.ch/index.html | grep -i "conte
 # → erwartet: Content-Encoding: br
 ```
 
-Oder als npm-Skript: `npm run deploy:check` führt Schritt 1+2 in einem Rutsch aus, danach manueller `rsync`.
+`check.js` schlägt fehl, wenn `index.html`, `rabbit-hole.js` oder `manifest.json` geändert wurden, ohne dass `npm run sw:stamp` gelaufen ist — ein vergessener Cache-Bump kann so nicht mehr live gehen.
+
+**News-Proxy:** `public/api/feed.php` lädt die RSS-Feeds serverseitig (Whitelist, 15-Min-Cache in `public/api/cache/`, per `.htaccess` gesperrt). Voraussetzung auf Hostpoint: PHP ≥ 7.4 mit cURL oder `allow_url_fopen`. `scripts/deploy.sh` prüft den Proxy im Smoke-Test. Neue Feeds: in `FEEDS` (PHP) **und** `RSS_FEEDS` (index.html) eintragen.
 
 ---
 
@@ -200,10 +202,7 @@ rsync -avz --delete public/ user@server:/var/www/btc-klar.ch/
 
 ### Bei Service-Worker-Update (sw.js geändert)
 
-1. **Cache-Version bumpen** in `public/sw.js`:
-   ```js
-   const SHELL_CACHE = 'satoshi-vXX';   // XX hochzählen
-   ```
+1. **Cache-Version bumpen:** `npm run sw:stamp` (zählt `SHELL_CACHE` hoch und setzt den `shell-hash` — nicht von Hand ändern)
 2. **APP_VERSION bumpen** in `public/index.html`:
    ```js
    const APP_VERSION = '3.X.0';

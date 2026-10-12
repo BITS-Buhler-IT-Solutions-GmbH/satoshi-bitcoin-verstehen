@@ -30,7 +30,10 @@ const TARGETS = [
   'robots.txt',
   'icons/icon.svg',
   'icons/donation-qr.svg'
-];
+].concat(
+  // Inhaltspaket aus scripts/build.js (Name enthält Hash)
+  fs.readdirSync(ROOT).filter(function(f) { return /^screens\.[0-9a-f]+\.json$/.test(f); })
+);
 
 function fmtKB(bytes) { return (bytes / 1024).toFixed(1) + ' KiB'; }
 

@@ -2,7 +2,8 @@
  *  Cache-first for app shell, network-first for API data
  */
 
-const SHELL_CACHE  = 'satoshi-v37';
+const SHELL_CACHE  = 'satoshi-v46';
+// shell-hash: 641ca8e55fdf  (gesetzt von scripts/sw-stamp.js — nicht von Hand ändern)
 const API_CACHE    = 'satoshi-api-v2';
 const API_TTL      = 5 * 60 * 1000;       // 5 minutes — serve cache without refresh
 const API_STALE    = 24 * 60 * 60 * 1000; // 24h hard limit for offline fallback
@@ -13,13 +14,15 @@ const SHELL_FILES = [
   '/index.html',
   '/rabbit-hole.js',
   '/manifest.json',
-  '/icons/icon.svg'
+  '/icons/icon.svg',
+  '/icons/icon-192.png'
 ];
 
 const API_ORIGINS = [
   'blockchain.info',
   'api.coingecko.com',
-  'mempool.space'
+  'mempool.space',
+  'api.alternative.me'
 ];
 
 /* ── Install: pre-cache app shell ──────────────────────────────
@@ -68,7 +71,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Everything else (shell / static assets) → cache-first
+  // Eigene API-Endpunkte (z. B. /api/feed.php) → network-first mit TTL
+  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) {
+    event.respondWith(networkFirstWithTTL(request));
+    return;
+  }
+
+  // Fremde Ursprünge (Embeds, Analytics) nicht cachen —
+  // sonst frieren Live-Inhalte bis zum nächsten SW-Update ein.
+  if (url.origin !== self.location.origin) return;
+
+  // Eigene Shell / statische Dateien → cache-first
   event.respondWith(cacheFirst(request));
 });
 
@@ -96,7 +109,7 @@ async function cacheFirst(request) {
 }
 
 /* ── Stale-while-revalidate for API responses ────────────────────
- * - Within TTL: serve cache immediately, no network roundtrip.
+ * - Within TTL: serve cache immediately, refresh in background.
  * - Stale but within hard limit: serve cache, refresh in background.
  * - Expired / missing: go to network; on failure, return last known
  *   value if available, else a 503.

@@ -101,10 +101,12 @@ Remove: veraltete API-Referenz
 
 ## Wichtige Hinweise
 
-- **SW Cache bumpen:** Bei Änderungen an `index.html` oder `rabbit-hole.js` muss `SHELL_CACHE` in `sw.js` inkrementiert werden
+- **SW Cache bumpen:** Nach Änderungen an `index.html`, `rabbit-hole.js` oder `manifest.json` `npm run sw:stamp` ausführen (bzw. `npm run build`) — `check.js` schlägt sonst fehl
+- **Lernreise erweitern:** Neue Module in `rabbit-hole.js` nur als neues Kapitel **am Ende** anhängen (Fortschritt ist index-basiert) und im Modul ein `hidden-rabbit` setzen — `check.js` prüft beides
+- **Klickbare Elemente:** Wenn möglich `<button>`/`<a>` verwenden; `div`/`span` mit `onclick` bekommen automatisch `role="button"` + Tastaturbedienung (`enhanceClickables`)
 - **Sats-Budget:** Das Gesamtbudget darf 100'000'000 Sats (1 BTC) nicht überschreiten
 - **Keine externen Abhängigkeiten:** Keine npm-Pakete, keine CDN-Links (ausser Umami Analytics)
-- **Keine persönlichen Daten:** Die App sammelt keine User-Daten (localStorage ist lokal)
+- **Keine persönlichen Daten:** Fortschritt bleibt lokal (localStorage); einzig Umami misst anonym und cookielos Seitenaufrufe (in der Datenschutzerklärung offengelegt)
 
 ## Lizenz
 

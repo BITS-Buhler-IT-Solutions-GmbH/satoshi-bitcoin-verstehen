@@ -5,7 +5,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
+const zlib = require('zlib');
 
 // /public ist Document-Root, unabhängig vom CWD
 const ROOT = path.resolve(__dirname, '..', 'public');
@@ -25,8 +25,21 @@ const MIME = {
   '.woff': 'font/woff',
 };
 
+// Textantworten gzip-komprimiert senden (wie Apache/nginx in Produktion),
+// damit lokale Lighthouse-Messungen realistisch sind.
+function send(req, res, type, data) {
+  const headers = { 'Content-Type': type, 'Cache-Control': 'no-cache' };
+  if (/text|javascript|json|xml|svg/.test(type) && /gzip/.test(req.headers['accept-encoding'] || '')) {
+    data = zlib.gzipSync(data, { level: 6 });
+    headers['Content-Encoding'] = 'gzip';
+    headers['Vary'] = 'Accept-Encoding';
+  }
+  res.writeHead(200, headers);
+  res.end(data);
+}
+
 http.createServer((req, res) => {
-  const parsed = url.parse(req.url);
+  const parsed = new URL(req.url, 'http://localhost');
   let filePath = path.join(ROOT, decodeURIComponent(parsed.pathname));
 
   // Block path traversal
@@ -41,16 +54,14 @@ http.createServer((req, res) => {
         if (!isAsset) {
           fs.readFile(path.join(ROOT, 'index.html'), (e2, d2) => {
             if (e2) { res.writeHead(404); res.end('Not found'); return; }
-            res.writeHead(200, { 'Content-Type': MIME['.html'] });
-            res.end(d2);
+            send(req, res, MIME['.html'], d2);
           });
           return;
         }
         res.writeHead(404); res.end('Not found'); return;
       }
       const ext = path.extname(filePath).toLowerCase();
-      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
-      res.end(data);
+      send(req, res, MIME[ext] || 'application/octet-stream', data);
     });
   });
 }).listen(PORT, '127.0.0.1', () => {

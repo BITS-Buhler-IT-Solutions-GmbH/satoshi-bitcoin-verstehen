@@ -7,7 +7,9 @@
   'use strict';
 
   /* ══════════════════════════════════════════════════════════════
-   *  JOURNEY PATH — 39 Module in logischer Lernreihenfolge
+   *  JOURNEY PATH — alle Lernmodule in logischer Reihenfolge
+   *  Neue Module nur als NEUES Kapitel am Ende anhängen: der Fortschritt
+   *  wird als Schritt-Index gespeichert, Einfügen verschiebt Spielstände.
    * ══════════════════════════════════════════════════════════════ */
 
   var CHAPTERS = [
@@ -46,6 +48,16 @@
         'whitepaper', 'krypto', 'energie', 'netzwerk', 'layer2',
         'onchain', 'entwicklung', 'cbdc', 'vergleich', 'news', 'social'
       ]
+    },
+    {
+      id: 'wonderland',
+      title: 'Back in Wonderland',
+      subtitle: 'Zurück an der Oberfläche — mit Praxis, Privatsphäre und einem kritischen Blick.',
+      emoji: '🌷',
+      color: '#22c55e',
+      keys: [
+        'bitcoin-schweiz', 'privacy', 'kritik', 'funfacts'
+      ]
     }
   ];
 
@@ -56,7 +68,7 @@
   });
 
   /* Reward per module completion in the journey */
-  var STEP_REWARD = 1500000; // 1,500,000 sats × 39 = 58,500,000
+  var STEP_REWARD = 1500000; // pro Station
 
   /* Map module key → short teaser */
   var MODULE_TEASERS = {
@@ -103,7 +115,7 @@
 
   /* ══════════════════════════════════════════════════════════════
    *  HIDDEN WHITE RABBITS — derived from JOURNEY_KEYS so the two
-   *  lists can never drift apart. 500,000 sats each × 39 = 19,500,000.
+   *  lists can never drift apart. 500,000 sats each.
    * ══════════════════════════════════════════════════════════════ */
 
   var RABBIT_REWARD = 500000;
@@ -308,111 +320,11 @@
    * ══════════════════════════════════════════════════════════════ */
 
   function injectCSS() {
-    var style = document.createElement('style');
-    style.textContent = [
-      /* Floating Rabbit Button */
-      '.rabbit-fab{position:fixed;bottom:calc(var(--nav-height,56px) + env(safe-area-inset-bottom,0px) + 72px);right:16px;z-index:998;width:48px;height:48px;border-radius:50%;background:var(--surface);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:transform 0.2s,box-shadow 0.2s;-webkit-tap-highlight-color:transparent}',
-      '.rabbit-fab:hover,.rabbit-fab:active{transform:scale(1.08);box-shadow:0 6px 24px rgba(247,183,49,0.3)}',
-      '.rabbit-fab .rabbit-emoji{font-size:1.5rem;line-height:1}',
-      '.rabbit-fab-ring{position:absolute;top:-3px;left:-3px;width:52px;height:52px}',
-      '.rabbit-fab-ring circle{fill:none;stroke-width:3;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}',
-      '.rabbit-fab .rabbit-step-badge{position:absolute;top:-6px;right:-10px;background:var(--gold);color:var(--bg);font-size:0.6rem;font-weight:700;min-width:20px;height:18px;padding:0 5px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);white-space:nowrap}',
-
-      /* Pulse */
-      '@keyframes rabbitPulse{0%,100%{box-shadow:0 4px 20px rgba(0,0,0,0.4)}50%{box-shadow:0 4px 24px rgba(247,183,49,0.5)}}',
-      '.rabbit-fab.has-next{animation:rabbitPulse 2.5s ease-in-out infinite}',
-
-      /* Journey Overview Screen */
-      '.rabbit-hero{text-align:center;padding:32px 20px 16px}',
-      '.rabbit-hero-emoji{font-size:3rem;display:block;margin-bottom:8px}',
-      '.rabbit-hero h1{font-size:1.6rem;font-weight:800;color:var(--text)}',
-      '.rabbit-hero h1 .gold{color:var(--gold)}',
-      '.rabbit-hero-sub{color:var(--muted);font-size:var(--text-sm);margin-top:6px;line-height:1.5}',
-
-      /* Progress bar */
-      '.rabbit-progress-bar{margin:0 20px 24px;height:6px;background:var(--surface);border-radius:3px;overflow:hidden}',
-      '.rabbit-progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold),#8b5cf6);border-radius:3px;transition:width 0.6s ease}',
-      '.rabbit-progress-label{text-align:center;font-size:var(--text-xs);color:var(--muted);margin-bottom:20px;font-family:var(--font-mono)}',
-
-      /* Chapter blocks */
-      '.rabbit-chapter{margin:0 16px 8px;padding:16px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--muted)}',
-      '.rabbit-chapter.active{border-left-color:var(--gold)}',
-      '.rabbit-chapter.done{border-left-color:var(--green)}',
-      '.rabbit-chapter-head{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}',
-      '.rabbit-chapter-emoji{font-size:1.4rem}',
-      '.rabbit-chapter-title{font-weight:700;font-size:var(--text-sm);color:var(--text)}',
-      '.rabbit-chapter-count{margin-left:auto;font-size:var(--text-xs);color:var(--muted);font-family:var(--font-mono)}',
-      '.rabbit-chapter-sub{color:var(--muted);font-size:var(--text-xs);margin-top:6px;line-height:1.4;font-style:italic}',
-      '.rabbit-chapter-steps{margin-top:12px;display:none}',
-      '.rabbit-chapter-steps.is-open{display:block}',
-      '.rabbit-chapter-head:focus-visible,.rabbit-step:focus-visible,.rabbit-fab:focus-visible,.rabbit-home-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}',
-
-      /* Steps */
-      '.rabbit-step{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity 0.2s}',
-      '.rabbit-step:last-child{border-bottom:none}',
-      '.rabbit-step-icon{font-size:1.1rem;width:28px;text-align:center;flex-shrink:0}',
-      '.rabbit-step-info{flex:1;min-width:0}',
-      '.rabbit-step-name{font-size:var(--text-sm);font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.rabbit-step-teaser{font-size:var(--text-xs);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}',
-      '.rabbit-step-status{flex-shrink:0;width:24px;text-align:center;font-size:0.85rem}',
-      '.rabbit-step.completed .rabbit-step-name{color:var(--green)}',
-      '.rabbit-step.current{background:rgba(247,183,49,0.06);margin:0 -12px;padding:10px 12px;border-radius:var(--radius-sm)}',
-      '.rabbit-step.current .rabbit-step-name{color:var(--gold)}',
-      '.rabbit-step.future{opacity:0.5}',
-      '.rabbit-step-reward{font-size:var(--text-xs);color:var(--gold);font-family:var(--font-mono)}',
-
-      /* Buttons */
-      '.rabbit-actions{padding:20px 16px 32px;text-align:center;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}',
-      '.rabbit-btn{display:inline-block;padding:12px 28px;border-radius:var(--radius-sm);font-size:var(--text-sm);font-weight:700;cursor:pointer;border:none;transition:all 0.2s;-webkit-tap-highlight-color:transparent}',
-      '.rabbit-btn-primary{background:var(--gold);color:var(--bg)}',
-      '.rabbit-btn-primary:hover{filter:brightness(1.1)}',
-      '.rabbit-btn-secondary{background:var(--surface);color:var(--text);border:1px solid rgba(255,255,255,0.1)}',
-      '.rabbit-btn-secondary:hover{border-color:var(--gold)}',
-      '.rabbit-btn-danger{background:transparent;color:var(--muted);font-size:var(--text-xs);padding:8px 16px}',
-      '.rabbit-btn-danger:hover{color:var(--red)}',
-
-      /* Next module banner */
-      '.rabbit-next-banner{position:fixed;bottom:calc(var(--nav-height,56px) + env(safe-area-inset-bottom,0px));left:0;right:0;background:linear-gradient(180deg,transparent 0%,var(--bg) 40%);padding:28px 16px 8px;z-index:997;display:none}',
-      '.rabbit-next-inner{background:var(--surface);border:1px solid rgba(247,183,49,0.2);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color 0.2s}',
-      '.rabbit-next-inner:hover{border-color:var(--gold)}',
-      '.rabbit-next-text{flex:1;min-width:0}',
-      '.rabbit-next-label{font-size:var(--text-xs);color:var(--gold);font-weight:600}',
-      '.rabbit-next-module{font-size:var(--text-sm);color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.rabbit-next-arrow{color:var(--gold);font-size:1.2rem;flex-shrink:0}',
-
-      /* Home card */
-      '.rabbit-home-card{border:1px solid rgba(247,183,49,0.15);background:linear-gradient(135deg,rgba(247,183,49,0.04),transparent);cursor:pointer;transition:border-color 0.2s;-webkit-tap-highlight-color:transparent}',
-      '.rabbit-home-card:hover{border-color:var(--gold)}',
-
-      /* Hidden white rabbit */
-      '.hidden-rabbit{display:inline-block;cursor:pointer;font-size:0.85rem;opacity:0.12;transition:all 0.4s ease;user-select:none;position:relative;vertical-align:middle;padding:8px;margin:-8px;animation:rabbitPulse2 4s ease-in-out infinite}',
-      '.hidden-rabbit:hover,.hidden-rabbit:active{opacity:0.45;transform:scale(1.3)}',
-      '.hidden-rabbit.found{opacity:1;animation:rabbitCaught 0.8s ease forwards;filter:drop-shadow(0 0 6px #fff);padding:0;margin:0;cursor:default;color:#fff}',
-      '@keyframes rabbitPulse2{0%,100%{opacity:0.08}50%{opacity:0.18}}',
-      '@keyframes rabbitCaught{0%{transform:scale(1)}30%{transform:scale(2.5) rotate(15deg)}60%{transform:scale(0.8) rotate(-5deg)}100%{transform:scale(1) rotate(0deg)}}',
-
-      /* Rabbit counter badge on screens */
-      '.rabbit-counter-mini{font-size:var(--text-xs);color:rgba(255,255,255,0.5);display:inline-flex;align-items:center;gap:4px}',
-
-      /* Overlays */
-      '.rabbit-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.4s}',
-      '.rabbit-overlay.visible{opacity:1}',
-      '.rabbit-overlay-card{background:var(--card);border-radius:var(--radius);padding:32px 24px;text-align:center;max-width:340px;width:100%;border:2px solid var(--gold);box-shadow:0 24px 64px rgba(0,0,0,0.5)}',
-      '.rabbit-overlay-card h2{font-size:1.4rem;color:var(--gold);margin:12px 0 8px}',
-      '.rabbit-overlay-card p{color:var(--muted);font-size:var(--text-sm);line-height:1.6}',
-
-      /* Complete button at module end */
-      '.rabbit-complete-wrap{padding:24px 16px 32px}',
-      '.rabbit-complete-card{background:var(--surface);border:1px solid rgba(247,183,49,0.2);border-radius:var(--radius);padding:20px;text-align:center}',
-      '.rabbit-complete-btn{font-size:var(--text-sm) !important;padding:14px 24px !important}',
-
-      /* Rabbit stats card on overview */
-      '.rabbit-stats{margin:0 16px 16px;padding:16px;background:var(--surface);border-radius:var(--radius);display:flex;gap:16px;justify-content:center;flex-wrap:wrap}',
-      '.rabbit-stat{text-align:center;min-width:70px}',
-      '.rabbit-stat-val{font-size:1.2rem;font-weight:700;font-family:var(--font-mono);color:var(--gold)}',
-      '.rabbit-stat-label{font-size:var(--text-xs);color:var(--muted);margin-top:2px}'
-    ].join('\n');
-    document.head.appendChild(style);
+    /* Die Styles liegen seit v3.4.0 im Haupt-Stylesheet von index.html
+     * (<style id="rabbit-css">). Ein nachträglich angehängtes <style>
+     * erzwang eine komplette Style-Neuberechnung (~340 ms Long Task). */
+    if (document.getElementById('rabbit-css')) return;
+    console.warn('RabbitHole: #rabbit-css fehlt in index.html — Styles nicht geladen');
   }
 
   /* ══════════════════════════════════════════════════════════════
@@ -561,10 +473,10 @@
       '<h1>Follow the <span class="gold">White Rabbit</span></h1>' +
       '<p class="rabbit-hero-sub">' + (
         !isStarted
-          ? 'Eine geführte Reise durch den Bitcoin-Kaninchenbau. 39 Module, 3 Kapitel — vom Einsteiger zum Experten.'
+          ? 'Eine geführte Reise durch den Bitcoin-Kaninchenbau. ' + JOURNEY_KEYS.length + ' Module, ' + CHAPTERS.length + ' Kapitel — vom Einsteiger zum Experten.'
           : isComplete
             ? 'Du hast den gesamten Kaninchenbau erforscht. Respekt!'
-            : 'Kapitel ' + (getChapterForStep(state.currentStep).index + 1) + ' von 3 — ' + progress.done + ' von ' + progress.total + ' Stationen erkundet'
+            : 'Kapitel ' + (getChapterForStep(state.currentStep).index + 1) + ' von ' + CHAPTERS.length + ' — ' + progress.done + ' von ' + progress.total + ' Stationen erkundet'
       ) + '</p>' +
       '</div>';
 
@@ -629,7 +541,7 @@
 
     /* Hidden rabbits section */
     html += '<div style="margin:20px 16px 8px"><div style="font-weight:700;font-size:var(--text-sm);color:var(--text);margin-bottom:8px">🐇 Versteckte weisse Kaninchen</div>';
-    html += '<div style="color:var(--muted);font-size:var(--text-xs);line-height:1.5;margin-bottom:12px">In jedem der 39 Module versteckt sich ein weisses Kaninchen. Finde sie alle!</div>';
+    html += '<div style="color:var(--muted);font-size:var(--text-xs);line-height:1.5;margin-bottom:12px">In jedem der ' + HIDDEN_RABBITS.length + ' Module versteckt sich ein weisses Kaninchen. Finde sie alle!</div>';
     html += '<div class="rabbit-progress-bar" style="margin:0 0 8px"><div class="rabbit-progress-fill" style="width:' + rabbitProg.pct + '%"></div></div>';
     html += '<div style="text-align:center;font-size:var(--text-xs);color:var(--muted);font-family:var(--font-mono)">' + rabbitProg.done + '/' + rabbitProg.total + ' Kaninchen gefunden</div>';
     html += '</div>';
@@ -683,7 +595,7 @@
       el.innerHTML = '<div class="card rabbit-home-card animate-in" role="button" tabindex="0" data-action="nav-rabbithole" style="padding:16px;text-align:center">' +
         '<div style="font-size:1.8rem;margin-bottom:6px">🐇</div>' +
         '<div style="font-weight:700;color:var(--gold);font-size:var(--text-sm)">Follow the White Rabbit</div>' +
-        '<div style="color:var(--muted);font-size:var(--text-xs);margin-top:4px;line-height:1.4">Lass dich durch 39 Module führen — vom Einsteiger zum Experten</div>' +
+        '<div style="color:var(--muted);font-size:var(--text-xs);margin-top:4px;line-height:1.4">Lass dich durch ' + JOURNEY_KEYS.length + ' Module führen — vom Einsteiger zum Experten</div>' +
         '</div>';
     } else if (progress.done >= progress.total) {
       el.innerHTML = '<div class="card rabbit-home-card animate-in" role="button" tabindex="0" data-action="nav-rabbithole" style="padding:14px;text-align:center">' +
@@ -705,6 +617,20 @@
         '</div>' +
         '<div class="rabbit-progress-bar" style="margin:8px 0 0;height:4px"><div class="rabbit-progress-fill" style="width:' + progress.pct + '%"></div></div>' +
         '</div>';
+    }
+    var journeyCard = el.querySelector('.rabbit-home-card');
+    if (journeyCard) {
+      var trail = document.createElement('div');
+      trail.className = 'rabbit-home-trail';
+      trail.innerHTML = CHAPTERS.map(function(ch, index) {
+        var done = ch.keys.filter(function(key) { return isStepCompleted(getStepGlobalIndex(key)); }).length;
+        var active = isStarted && progress.done < progress.total && index === getChapterForStep(state.currentStep).index;
+        return '<div class="rabbit-trail-stop' + (done === ch.keys.length ? ' done' : active ? ' current' : '') + '">' +
+          '<span class="rabbit-trail-number">' + (done === ch.keys.length ? '✓' : '0' + (index + 1)) + '</span>' +
+          '<span class="rabbit-trail-label">' + escHtml(ch.title) + '</span>' +
+          '<span class="rabbit-trail-count">' + done + '/' + ch.keys.length + '</span></div>';
+      }).join('');
+      journeyCard.appendChild(trail);
     }
     attachDelegatedHandlers(el);
   }
@@ -760,7 +686,7 @@
     overlay.innerHTML = '<div class="rabbit-overlay-card">' +
       '<div style="font-size:3rem">🐇🐇🐇</div>' +
       '<h2>Alle Kaninchen gefunden!</h2>' +
-      '<p>Du hast alle 39 versteckten weissen Kaninchen im Kaninchenbau entdeckt. Alice wäre stolz auf dich.</p>' +
+      '<p>Du hast alle ' + HIDDEN_RABBITS.length + ' versteckten weissen Kaninchen im Kaninchenbau entdeckt. Alice wäre stolz auf dich.</p>' +
       '<p style="color:var(--gold);margin-top:12px;font-weight:600;font-family:var(--font-mono)">+' + fmtNum(HIDDEN_RABBITS.length * RABBIT_REWARD) + ' Sats</p>' +
       '<button class="rabbit-btn rabbit-btn-primary" style="margin-top:20px;width:100%">Weiter</button>' +
       '</div>';
@@ -812,7 +738,7 @@
     overlay.innerHTML = '<div class="rabbit-overlay-card">' +
       '<div style="font-size:3rem">🎩🐇✨</div>' +
       '<h2>Der Kaninchenbau ist erforscht!</h2>' +
-      '<p>Du hast alle 39 Module durchlaufen — von den Grundlagen bis zur Kryptographie. Du verstehst jetzt mehr über Bitcoin als 99% der Bevölkerung.</p>' +
+      '<p>Du hast alle ' + JOURNEY_KEYS.length + ' Module durchlaufen — von den Grundlagen bis zur Kryptographie. Du verstehst jetzt mehr über Bitcoin als 99% der Bevölkerung.</p>' +
       '<p style="color:var(--gold);margin-top:12px;font-weight:600;font-family:var(--font-mono)">Total: +' + fmtNum(totalEarned) + ' Sats</p>' +
       '<p style="color:var(--muted);margin-top:8px;font-size:var(--text-xs)">«We\'re all mad here.» — Cheshire Cat</p>' +
       '<button class="rabbit-btn rabbit-btn-primary" style="margin-top:20px;width:100%">🏠 Zur Übersicht</button>' +
@@ -838,10 +764,10 @@
   function start() {
     state = defaultState();
 
-    /* Pre-populate from existing visitedModules */
-    if (typeof visitedModules !== 'undefined' && Array.isArray(visitedModules)) {
+    /* Nur bewusst abgeschlossene Module übernehmen. */
+    if (typeof completedModules !== 'undefined' && Array.isArray(completedModules)) {
       JOURNEY_KEYS.forEach(function (key, idx) {
-        if (visitedModules.includes(key) && !state.completedSteps.includes(idx)) {
+        if (completedModules.includes(key) && !state.completedSteps.includes(idx)) {
           state.completedSteps.push(idx);
           /* Don't reward pre-existing visits */
         }
@@ -901,12 +827,13 @@
     if (!state) return;
     if (state.completedSteps.includes(stepIndex)) return;
     state.completedSteps.push(stepIndex);
+    if (typeof markModuleComplete === 'function') markModuleComplete(JOURNEY_KEYS[stepIndex]);
 
     /* Reward sats for journey completion */
     if (!state.rewardedSteps.includes(stepIndex)) {
       state.rewardedSteps.push(stepIndex);
       if (typeof addSats === 'function') {
-        addSats(STEP_REWARD, '🐇 Rabbit Hole: Station ' + (stepIndex + 1) + '/39');
+        addSats(STEP_REWARD, '🐇 Rabbit Hole: Station ' + (stepIndex + 1) + '/' + JOURNEY_KEYS.length);
       }
     }
 
@@ -1074,10 +1001,9 @@
     /* Init already-visible rabbits */
     setTimeout(initRabbits, 300);
 
-    /* Inject home card */
-    setTimeout(function () {
-      injectHomeCard();
-    }, 500);
+    /* Home-Karte sofort einfügen: so landet sie im ersten Layout statt
+     * 500 ms später ein zweites Layout der Startseite zu erzwingen. */
+    injectHomeCard();
   }
 
   /* ══════════════════════════════════════════════════════════════

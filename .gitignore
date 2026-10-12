@@ -38,3 +38,7 @@ public/*.gz
 public/*.br
 public/icons/*.gz
 public/icons/*.br
+
+# Build-Ausgabe von scripts/build.js — Quelle ist src/index.html
+public/index.html
+public/screens.*.json

@@ -19,6 +19,9 @@
   RewriteCond %{HTTP_HOST} !=localhost
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+  # ── Feed-Cache nie direkt ausliefern ─────────────────────────
+  RewriteRule ^api/cache/ - [F,L]
+
   # ── Pre-compressed Brotli ────────────────────────────────────
   # Wenn der Client Brotli akzeptiert UND eine .br-Variante existiert,
   # diese ausliefern (vor dem SPA-Fallback prüfen, sonst greift der
@@ -106,7 +109,7 @@
   Header always set X-Frame-Options "DENY"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://platform.twitter.com https://cloud.umami.is; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://api.blockchain.info https://blockchain.info https://api.coingecko.com https://mempool.space https://api.alternative.me https://api.codetabs.com https://api.allorigins.win https://cloud.umami.is; frame-src https://platform.twitter.com https://www.youtube.com https://btcmap.org https://bitcoindeaths.com; manifest-src 'self'; worker-src 'self';"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://api.blockchain.info https://blockchain.info https://api.coingecko.com https://mempool.space https://api.alternative.me https://cloud.umami.is https://gateway.umami.is; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://btcmap.org https://bitcoindeaths.com; manifest-src 'self'; worker-src 'self';"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>
 
@@ -134,6 +137,11 @@
   # Service Worker — niemals cachen, sonst kommen Updates nie an
   <FilesMatch "sw\.js$">
     Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  </FilesMatch>
+
+  # Inhaltspaket screens.<hash>.json — Name ändert sich mit dem Inhalt
+  <FilesMatch "^screens\.[0-9a-f]+\.json(\.gz|\.br)?$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 
   # rabbit-hole.js — immer revalidieren

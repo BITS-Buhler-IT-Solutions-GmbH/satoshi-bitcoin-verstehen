@@ -1,16 +1,19 @@
 {
   "name": "bits-satoshi-app",
-  "version": "3.3.0",
+  "version": "3.6.0",
   "description": "Satoshi — Bitcoin Verstehen. Kostenlose, Open-Source-PWA für Bitcoin-Bildung auf Deutsch.",
   "private": true,
   "scripts": {
+    "test": "node scripts/check-progress.js && node scripts/check-learning.js",
     "check": "node scripts/check.js",
-    "dev": "node scripts/dev-server.js",
+    "sw:stamp": "node scripts/sw-stamp.js",
+    "build": "node scripts/build.js && node scripts/sw-stamp.js && node scripts/compress.js && node scripts/check.js",
+    "dev": "node scripts/build.js && node scripts/dev-server.js",
     "compress": "node scripts/compress.js",
-    "deploy:check": "node scripts/check.js && node scripts/compress.js",
+    "deploy:check": "node scripts/build.js && node scripts/sw-stamp.js && node scripts/compress.js && node scripts/check.js",
     "deploy": "bash scripts/deploy.sh",
-    "qr": "npx --yes qrcode -t svg -o public/icons/donation-qr.svg \"bitcoin:$(node -e \"const fs=require('fs');const m=fs.readFileSync('public/index.html','utf8').match(/donationAddr:\\s*['\\\"]([^'\\\"]+)/);console.log(m[1])\")\"",
-    "version:bump": "echo Manuell in public/index.html APP_VERSION + sw.js SHELL_CACHE bumpen"
+    "qr": "npx --yes qrcode -t svg -o public/icons/donation-qr.svg \"bitcoin:$(node -e \"const fs=require('fs');const m=fs.readFileSync('src/index.html','utf8').match(/donationAddr:\\s*['\\\"]([^'\\\"]+)/);console.log(m[1])\")\"",
+    "version:bump": "echo APP_VERSION/APP_BUILD in src/index.html + CHANGELOG pflegen, dann: npm run build"
   },
   "keywords": [
     "bitcoin",
@@ -28,5 +31,8 @@
   "license": "MIT",
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12"
   }
 }
